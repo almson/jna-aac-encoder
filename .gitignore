@@ -182,3 +182,4 @@ jni/**/*.dll
 jni/**/*.so
 
 gradle.properties
+/target/
