@@ -29,6 +29,7 @@ public final class FdkAACLib {
         DECODER_SETPARAM("aacDecoder_SetParam"),
         DECODER_STREAMINFO("aacDecoder_GetStreamInfo"),
         DECODER_FILL("aacDecoder_Fill"),
+        DECODER_RAWISOBMFF("aacDecoder_RawISOBMFFData"),
         DECODER_DECODEFRAME("aacDecoder_DecodeFrame"),
         ;
 
@@ -69,6 +70,8 @@ public final class FdkAACLib {
             PointerByReference buffer,
             IntByReference bufferSize,
             IntByReference bytesValid);
+    
+    static native int aacDecoder_RawISOBMFFData(AACDecoderHandle self, ByteBuffer buffer, int length);
 
     static native int aacDecoder_DecodeFrame(
             AACDecoderHandle self,

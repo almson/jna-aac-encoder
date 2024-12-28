@@ -230,6 +230,20 @@ public final class FdkAACLibFacade {
   }
   
   /**
+   * Submit raw ISO base media file format boxes to decoder for parsing (only some box types are recognized).
+   * It's completely unclear how this is supposed to work. How much data does it read? Etc.
+   *
+   * @param decoder AAC decoder handle.
+   * @param buffer  Byte buffer containing the binary box data
+   */
+  public static void decoderFillISOBMFF(@Nonnull AACDecoderHandle decoder, @Nonnull ByteBuffer buffer) throws FdkAACLibException {
+    if (decoder == null) throw new NullPointerException("decoder is null");
+    var size = buffer.remaining();
+    int result = aacDecoder_RawISOBMFFData(decoder, buffer, size);
+    verifyResult(AACDecoderError.valueOf(result), FdkAACLib.Functions.DECODER_RAWISOBMFF);
+  }
+  
+  /**
    * Decode one audio frame, if enough data to do so is available.
    * If there is not enough coded data, returns without modifying the buffer's position.
    *
