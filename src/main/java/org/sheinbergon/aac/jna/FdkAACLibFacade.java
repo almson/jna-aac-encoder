@@ -7,6 +7,8 @@ import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 import java.nio.ByteBuffer;
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
 import lombok.Cleanup;
 import lombok.extern.java.Log;
 import lombok.val;
@@ -183,7 +185,26 @@ public final class FdkAACLibFacade {
     verifyResult(AACDecoderError.valueOf(result), FdkAACLib.Functions.DECODER_SETPARAM);
   }
   
-  public static @Nonnull CStreamInfo getDecoderInfo(@Nonnull AACDecoderHandle decoder) {
+  /**
+   * Initialize ancillary data buffer.
+   *
+   * @param decoder AAC decoder handle.
+   * @param buffer  Pointer to (external) ancillary data buffer.
+   * @throws FdkAACLibException
+   */
+  public static void decoderInitAncData(@Nonnull AACDecoderHandle decoder, Memory buffer) throws FdkAACLibException {
+    if (decoder == null) throw new NullPointerException("decoder is null");
+    var result = aacDecoder_AncDataInit(decoder, buffer, (int)buffer.size());
+    verifyResult(AACDecoderError.valueOf(result), FdkAACLib.Functions.DECODER_ANCDATAINIT);
+  }
+  
+  /**
+   * Get CStreamInfo handle from decoder.
+   *
+   * @param decoder  AAC decoder handle.
+   * @throws FdkAACLibException if out of memory?
+   */
+  public static @Nonnull CStreamInfo getDecoderInfo(@Nonnull AACDecoderHandle decoder) throws FdkAACLibException {
     if (decoder == null) throw new NullPointerException("decoder is null");
     var result = aacDecoder_GetStreamInfo(decoder);
     if (result == null || result.equals(Pointer.NULL))
@@ -272,7 +293,11 @@ public final class FdkAACLibFacade {
     // Stream info must be called after decode.
     // However, perhaps flags and params can affect it? Not sure. But I see downmixing is reflected correctly.
     var info = getDecoderInfo(decoder);
-    var size = info.frameSize * info.numChannels * IN_SAMPLES_DIVISOR;
+    int size;
+    if (List.of(flags).contains (AACDecodeFrameFlag.AACDEC_FLUSH))
+        size = info.outputDelay * info.numChannels * IN_SAMPLES_DIVISOR;
+    else
+        size = info.frameSize * info.numChannels * IN_SAMPLES_DIVISOR;
     buffer.position(buffer.position() + size);
     return size;
   }

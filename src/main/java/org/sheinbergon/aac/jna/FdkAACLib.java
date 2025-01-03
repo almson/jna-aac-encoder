@@ -1,5 +1,6 @@
 package org.sheinbergon.aac.jna;
 
+import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
@@ -27,6 +28,7 @@ public final class FdkAACLib {
         DECODER_OPEN("aacDecoder_Open"),
         DECODER_CLOSE("aacDecoder_Close"),
         DECODER_SETPARAM("aacDecoder_SetParam"),
+        DECODER_ANCDATAINIT("aacDecoder_AncDataInit"),
         DECODER_STREAMINFO("aacDecoder_GetStreamInfo"),
         DECODER_FILL("aacDecoder_Fill"),
         DECODER_RAWISOBMFF("aacDecoder_RawISOBMFFData"),
@@ -62,6 +64,8 @@ public final class FdkAACLib {
     static native void aacDecoder_Close(AACDecoderHandle self);
     
     static native int aacDecoder_SetParam(AACDecoderHandle self, int param, int value);
+    
+    static native int aacDecoder_AncDataInit(AACDecoderHandle self, Memory buffer, int size);
     
     static native Pointer aacDecoder_GetStreamInfo(AACDecoderHandle self);
 
